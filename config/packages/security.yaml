@@ -1,0 +1,37 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        in_memory: { memory: ~ }
+        entreprise:
+            entity:
+                class: App\Entity\Entreprise
+                property: email
+
+    encoders:
+        App\Entity\Entreprise:
+            algorithm: bcrypt
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        entreprise:
+            pattern: ^/entreprise
+            provider: entreprise
+            form_login:
+                login_path: security_login_entreprise
+                check_path: entreprise_login_check
+            logout:
+                path: logout
+                target: /
+        main:
+            anonymous: ~
+
+
+            # activate different ways to authenticate
+
+            # http_basic: ~
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+
+            # form_login: ~
+            # https://symfony.com/doc/current/security/form_login_setup.html

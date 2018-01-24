@@ -20,20 +20,26 @@
                     </div>
 
                     <div class="card-body py-5">
-                        <div class="form-group">
-                            <label class="form-control-label">Email</label>
-                            <input type="email" class="form-control">
-                        </div>
 
-                        <div class="form-group">
-                            <label class="form-control-label">Password</label>
-                            <input type="password" class="form-control">
-                        </div>
+                        <form action="{{ path('entreprise_login_check') }}" method="post">
+                            <div class="form-group">
+                                <label class="form-control-label">Email</label>
+                                <input type="email" class="form-control" name="_username" value="{{ last_username }}">
+                            </div>
 
-                        <div class="custom-control custom-checkbox mt-4">
-                            <input type="checkbox" class="custom-control-input" id="login">
-                            <label class="custom-control-label" for="login">Check this custom checkbox</label>
-                        </div>
+                            <div class="form-group">
+                                <label class="form-control-label">Password</label>
+                                <input type="password" class="form-control" name="_password">
+                            </div>
+
+                            <div class="custom-control custom-checkbox mt-4">
+                                <input type="checkbox" class="custom-control-input" id="login">
+                                <label class="custom-control-label" for="login">Check this custom checkbox</label>
+                            </div>
+
+                            <input type="submit" class="btn" value="login">
+
+                        </form>
                     </div>
 
                     <div class="card-footer">
@@ -48,6 +54,9 @@
                         </div>
                     </div>
                 </div>
+                {% if error %}
+                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
             </div>
         </div>
     </div>

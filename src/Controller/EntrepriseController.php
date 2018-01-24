@@ -11,21 +11,17 @@ namespace App\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class Entreprise extends Controller
+class EntrepriseController extends Controller
 {
     /**
      * @Route("/entreprise", name="entreprise_home")
      */
     public function home() {
-        return new Response("THB : controller not setup.");
+        return new Response("<body>THB : controller not setup.</body>");
     }
 
-    /**
-     * @Route("/entreprise/login", name="entreprise_login")
-     */
-    public function login() {
-        return $this->render("Entreprise/login.html.twig");
-    }
 }
