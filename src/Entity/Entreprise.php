@@ -38,6 +38,11 @@ class Entreprise implements UserInterface
     private $isActive;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Projet", mappedBy="entreprise")
+     */
+    private $projets;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -130,5 +135,21 @@ class Entreprise implements UserInterface
     public function getUsername()
     {
         return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProjets()
+    {
+        return $this->projets;
+    }
+
+    /**
+     * @param mixed $projets
+     */
+    public function setProjets($projets): void
+    {
+        $this->projets = $projets;
     }
 }
