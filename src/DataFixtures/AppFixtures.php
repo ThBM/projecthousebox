@@ -10,6 +10,8 @@ namespace App\DataFixtures;
 
 
 use App\Entity\Entreprise;
+use App\Entity\Projet;
+use App\Repository\EntrepriseRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -25,7 +27,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        for($i =0 ; $i < 5; $i++) {
+        /*for($i =0 ; $i < 5; $i++) {
             $entreprise = new Entreprise();
             $entreprise->setEmail("entreprise".$i."@gmail.com");
             $entreprise->setIsActive(true);
@@ -37,6 +39,15 @@ class AppFixtures extends Fixture
             $manager->persist($entreprise);
         }
 
-        $manager->flush();
+
+        for($i = 1; $i < 100; $i++) {
+            $entreprise = $manager->getRepository(EntrepriseRepository::class)->find(rand(1,5));
+            $projet = new Projet();
+            $projet->setNom(chr($i));
+            $projet->setEntreprise($entreprise);
+            $manager->persist($projet);
+        }
+
+        $manager->flush();*/
     }
 }

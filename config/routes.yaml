@@ -6,4 +6,4 @@ entreprise_login_check:
     path: /entreprise/login_check
 
 logout:
-    path: /logout
+    path: /entreprise/logout

@@ -1,0 +1,87 @@
+{% extends "Entreprise/base.html.twig" %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h1>Liste de mes projets</h1>
+        </div>
+        <div class="card-body">
+
+            <div class="row justify-content-center mb-3 pl-3 pr-3">
+                <div class="col">
+                    <div class="input-group mr-5 align-content-center">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input type="search" class="form-control" placeholder="Rechercher" id="search">
+                    </div>
+                 </div>
+                <div class="col text-right">
+                    <a href="{{ path('entreprise_projets_add') }}" class="btn btn-success text-white">Ajouter un projet</a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped" id="tableProjets">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nom du projet</th>
+                        <th>Date création</th>
+                        <th>Statut</th>
+                        <th style="width: 1px;"></th>
+                        <th style="width: 1px;"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for projet in app.user.projets %}
+                        <tr>
+                            <td>{{ projet.id }}</td>
+                            <td>{{ projet.nom }}</td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right text-white">
+                                <a href="{{ path('entreprise_projets_show', {"id": projet.id}) }}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Voir</a>
+                            </td>
+                            <td class="text-right text-white">
+                                <a href="{{ path('entreprise_projets_remove', {"id": projet.id}) }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Supprimer</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $.fn.dataTable.ext.search.push(function( settings, data, dataIndex ) {
+            var search = $("#search").val();
+            var regex = new RegExp(search, "i");
+
+            var length = data.length;
+
+            for(i=0; i<length-2; i++) {
+                if(data[i].match(regex)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        $(document).ready(function(){
+            var table = $('#tableProjets').DataTable({
+                "language": { url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"},
+                "dom": 'tp'
+            });
+            
+            $('#search').keyup(function () {
+                table.draw();
+            })
+        });
+
+    </script>
+{% endblock %}
