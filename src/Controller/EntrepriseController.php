@@ -41,12 +41,12 @@ class EntrepriseController extends Controller
             $em->persist($projet);
             $em->flush();
 
-            $this->addFlash("success", "Le projet a bien été créé.");
+            $this->addFlash("success", "a");
             return $this->redirectToRoute("entreprise_home");
         }
 
 
-        return $this->render("projet_add.html.twig", [
+        return $this->render("Entreprise/projet_add.html.twig", [
            "form" => $form->createView()
         ]);
     }

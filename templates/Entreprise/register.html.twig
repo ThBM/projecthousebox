@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset("assets/vendor/simple-line-icons/css/simple-line-icons.css") }}">
     <link rel="stylesheet" href="{{ asset("assets/vendor/font-awesome/css/fontawesome-all.min.css") }}">
     <link rel="stylesheet" href="{{ asset("assets/css/styles.css") }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/custom_style.css') }}">
 </head>
 <body>
 <div class="page-wrapper flex-row align-items-center">
@@ -16,62 +17,50 @@
             <div class="col-md-5">
                 <div class="card p-4">
 
-                    <form action="{{ path('entreprise_login_check') }}" method="post">
+                        {{ form_start(form) }}
 
                         <div class="card-header text-center text-uppercase h4 font-weight-light">
-                            Entreprise Login
+                            Créer un compte entreprise
                         </div>
 
                         <div class="card-body py-5">
 
+                            {{ form_errors(form.email) }}
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">@</span>
                                 </div>
-                                <input type="email" class="form-control" placeholder="Email" name="_username" value="{{ last_username }}">
+                                {{ form_widget(form.email) }}
                             </div>
 
+                            {{ form_errors(form.password.first) }}
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
                                 </div>
-                                <input type="password" class="form-control" placeholder="Mot de passe" name="_password">
+                                {{ form_widget(form.password.first) }}
                             </div>
 
-                            <div class="custom-control custom-checkbox mt-4 ">
-                                <input type="checkbox" class="custom-control-input" id="_remeber_me" name="_remeber_me">
-                                <label class="custom-control-label" for="_remeber_me">Rester connecter</label>
+                            {{ form_errors(form.password.second) }}
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
+                                </div>
+                                {{ form_widget(form.password.second) }}
                             </div>
-
-
                         </div>
+
+                        {# TODO : Insérer un Captcha #}
 
                         <div class="card-footer">
                             <div class="row">
                                 <div class="col">
-                                    <button type="submit" class="btn btn-block btn-primary">Se connecter</button>
-                                </div>
-                                <div class="col">
-                                    <a href="{{ path('security_register_entreprise') }}" class="btn btn-block btn-secondary text-white">Créer un compte</a>
+                                    <button type="submit" class="btn btn-block btn-primary">Créer son compte</button>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    {{ form_end(form) }}
                 </div>
-
-                {% if error %}
-                    <div class="alert alert-warning">
-                        <div>
-                            {% if error.messageKey|trans(error.messageData, 'security') == "Invalid credentials." %}
-                                Identifiant / Mot de passe incorrects.
-                            {% elseif error.messageKey|trans(error.messageData, 'security') == "Account is disabled."%}
-                                Votre compte n'a pas été activé. Voir le mail transmis à l'inscription.
-                            {% else %}
-                                {{ error.messageKey|trans(error.messageData, 'security') }}
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endif %}
 
                 {% for label, messages in app.flashes() %}
                     {% for message in messages %}
