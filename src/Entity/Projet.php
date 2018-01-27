@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Projet
 {
+
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,6 +27,36 @@ class Projet
      * @ORM\ManyToOne(targetEntity="App\Entity\Entreprise", inversedBy="projets")
      */
     private $entreprise;
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $statut;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $date;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $description;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Document", mappedBy="projet")
+     */
+    private $documents;
+
+    /**
+     * Projet constructor.
+     * @param $date
+     */
+    public function __construct()
+    {
+        $this->date = new \DateTime();
+        $this->statut = "Ouvert";
+    }
 
     /**
      * @return mixed
@@ -72,6 +104,70 @@ class Projet
     public function setEntreprise($entreprise): void
     {
         $this->entreprise = $entreprise;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatut()
+    {
+        return $this->statut;
+    }
+
+    /**
+     * @param mixed $statut
+     */
+    public function setStatut($statut): void
+    {
+        $this->statut = $statut;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param mixed $date
+     */
+    public function setDate($date): void
+    {
+        $this->date = $date;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDocuments()
+    {
+        return $this->documents;
+    }
+
+    /**
+     * @param mixed $documents
+     */
+    public function setDocuments($documents): void
+    {
+        $this->documents = $documents;
     }
 
 

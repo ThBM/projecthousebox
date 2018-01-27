@@ -20,6 +20,7 @@ class Entreprise implements AdvancedUserInterface
 
     /**
      * @ORM\Column(type="string", length=300, unique=true)
+     * @Assert\Email(message="L'email n'est pas valide.")
      */
     private $email;
 
@@ -43,6 +44,33 @@ class Entreprise implements AdvancedUserInterface
      * @ORM\OneToMany(targetEntity="App\Entity\Projet", mappedBy="entreprise")
      */
     private $projets;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $activationKey;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nom;
+
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $adresse;
+
+    /**
+     * @ORM\Column(type="string", length=11)
+     * @Assert\Regex("/^[0-9]{9}$/", message="Le SIREN doit contenir 9 chiffres.")
+     */
+    private $siren;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Contact", mappedBy="entreprise")
+     */
+    private $contacts;
 
     /**
      * @return mixed
@@ -215,4 +243,86 @@ class Entreprise implements AdvancedUserInterface
     {
         return $this->isActive;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getActivationKey()
+    {
+        return $this->activationKey;
+    }
+
+    /**
+     * @param mixed $activationKey
+     */
+    public function setActivationKey($activationKey): void
+    {
+        $this->activationKey = $activationKey;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNom()
+    {
+        return $this->nom;
+    }
+
+    /**
+     * @param mixed $nom
+     */
+    public function setNom($nom): void
+    {
+        $this->nom = $nom;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAdresse()
+    {
+        return $this->adresse;
+    }
+
+    /**
+     * @param mixed $adresse
+     */
+    public function setAdresse($adresse): void
+    {
+        $this->adresse = $adresse;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContacts()
+    {
+        return $this->contacts;
+    }
+
+    /**
+     * @param mixed $contacts
+     */
+    public function setContacts($contacts): void
+    {
+        $this->contacts = $contacts;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSiren()
+    {
+        return $this->siren;
+    }
+
+    /**
+     * @param mixed $siren
+     */
+    public function setSiren($siren): void
+    {
+        $this->siren = $siren;
+    }
+
+
 }

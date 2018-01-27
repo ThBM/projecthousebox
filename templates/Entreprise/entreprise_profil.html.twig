@@ -1,0 +1,34 @@
+{% extends "Entreprise/entreprise_detail.html.twig" %}
+{% set tabSelected = "profil" %}
+
+{% block tabContent %}
+    {{ form_start(form) }}
+
+        {{ form_errors(form.nom) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Société</span>
+            </div>
+            {{ form_widget(form.nom) }}
+        </div>
+
+        {{ form_errors(form.adresse) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Adresse</span>
+            </div>
+            {{ form_widget(form.adresse) }}
+        </div>
+
+        {{ form_errors(form.siren) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Société</span>
+            </div>
+            {{ form_widget(form.siren) }}
+        </div>
+        <div class="text-right">
+            <button type="submit" class="btn btn-primary">Modifier mon profil société</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

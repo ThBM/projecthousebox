@@ -2,5 +2,114 @@
 {% set tabSelected = "documents" %}
 
 {% block tabContent %}
-    TODO
+    <div class="row justify-content-center mb-3 pl-3 pr-3">
+        <div class="col">
+            <div class="input-group mr-5 align-content-center">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                </div>
+                <input type="search" class="form-control" placeholder="Rechercher" id="search">
+            </div>
+        </div>
+        <div class="col text-right">
+            <a class="btn btn-success text-white" data-toggle="modal", data-target="#modal-addDocument">Ajouter un document</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped" id="tableProjets">
+            <thead>
+            <tr>
+                <th>Date d'ajout</th>
+                <th>Type</th>
+                <th>Nom</th>
+                <th style="width: 1px;"></th>
+                <th style="width: 1px;"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for projet in 1..100 %}
+                <tr>
+                    <td>{{ projet }}</td>
+                    <td>{{ projet }}</td>
+                    <td></td>
+                    <td class="text-right text-white">
+                        <a href="{{ path('entreprise_projets_show', {"id": projet }) }}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Voir</a>
+                    </td>
+                    <td class="text-right text-white">
+                        <a href="{{ path('entreprise_projets_remove', {"id": projet}) }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+ {#
+    <div class="modal fade" id="modal-addProjet" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            {{ form_start(form) }}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un projet</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    {{ form_errors(form.nom) }}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Nom</span>
+                        </div>
+                        {{ form_widget(form.nom) }}
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter le projet</button>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+#}
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $.fn.dataTable.ext.search.push(function( settings, data, dataIndex ) {
+            var search = $("#search").val();
+            var regex = new RegExp(search, "i");
+
+            var length = data.length;
+
+            for(i=0; i<length-2; i++) {
+                if(data[i].match(regex)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        $(document).ready(function(){
+            var table = $('#tableProjets').DataTable({
+                "language": { url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"},
+                "dom": 'tp'
+            });
+
+            $('#search').keyup(function () {
+                table.draw();
+            })
+        });
+
+    </script>
 {% endblock %}

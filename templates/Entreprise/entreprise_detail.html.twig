@@ -1,0 +1,27 @@
+{% extends "Entreprise/base.html.twig" %}
+
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{{ path('entreprise_profil') }}" class="nav-link {% if tabSelected|default("profil") == "profil" %} active {% endif %}"><i class="fa fa-folder-open"></i> Profil société</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('entreprise_contacts') }}" class="nav-link {% if tabSelected == "contacts" %} active {% endif %}"><i class="fa fa-users"></i> Contacts de la société</a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link {% if tabSelected == "identifiants" %} active {% endif %}"><i class="fa fa-file"></i> Identifiants de connexion</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    {% block tabContent %}
+                    {% endblock %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

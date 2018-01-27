@@ -11,10 +11,12 @@ namespace App\Controller;
 
 use App\Entity\Entreprise;
 use App\Form\EntrepriseRegisterType;
+use App\Repository\EntrepriseRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -58,13 +60,15 @@ class SecurityController extends Controller
 
             $entreprise->setPassword($encoder->encodePassword($entreprise, $entreprise->getPassword()));
 
+            $entreprise->setActivationKey(uniqid());
+
             $em->persist($entreprise);
             $em->flush();
 
             $mail = new \Swift_Message("Housebox : Activez votre compte");
             $mail->setFrom("thibault.barolatmassole@gmail.com");
             $mail->setTo("thibault.bm@icloud.com");
-            $mail->setBody("Bonjour");
+            $mail->setBody("Activation key : ".$entreprise->getActivationKey());
 
             if($a = $mailer->send($mail))
                 $this->addFlash("success", "Email ok. TODO : check if email is sent. n=".$a);
@@ -77,4 +81,21 @@ class SecurityController extends Controller
     }
 
 
+    /**
+     * @Route("/activation/entreprise/{activationKey}")
+     */
+    public function testa($activationKey, ObjectManager $em) {
+        $entreprise = $em->getRepository(Entreprise::class)->findOneBy(["activationKey" => $activationKey]);
+
+        if(!$entreprise) {
+            $this->addFlash("warning", "Ce compte n'existe pas.");
+            return $this->redirectToRoute("security_login_entreprise");
+        }
+
+        $entreprise->setIsActive(true);
+        $em->flush();
+
+        $this->addFlash("success", "Votre compte a été activé. Vous pouvez vous connecter.");
+        return $this->redirectToRoute("security_login_entreprise");
+    }
 }

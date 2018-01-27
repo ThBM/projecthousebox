@@ -13,12 +13,9 @@
 <body class="header-fixed">
 <div class="page-wrapper">
     <nav class="navbar page-header">
-        <a href="#" class="btn btn-link sidebar-mobile-toggle d-md-none mr-auto">
-            <i class="fa fa-bars"></i>
-        </a>
 
         <a class="navbar-brand" href="#">
-            <img src="{{ asset("assets/imgs/logo.png") }}" alt="logo">
+            <img src="{{ asset("assets/imgs/houseboxLogo.png") }}" alt="logo" style="height: 40px;">
         </a>
 
         <ul class="navbar-nav ml-auto">
@@ -43,24 +40,13 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-header">Mon Compte</div>
 
-                    <a href="#" class="dropdown-item">
+                    <a href="{{ path('entreprise_home') }}" class="dropdown-item">
+                        <i class="fa fa-user"></i> Projets
+                    </a>
+
+                    <a href="{{ path('entreprise_profil') }}" class="dropdown-item">
                         <i class="fa fa-user"></i> Profil
-                    </a>
-
-                    <a href="#" class="dropdown-item">
-                        <i class="fa fa-envelope"></i> Messages
-                    </a>
-
-                    <div class="dropdown-header">Configuration</div>
-
-                    <a href="#" class="dropdown-item">
-                        <i class="fa fa-bell"></i> Notifications
-                    </a>
-
-                    <a href="#" class="dropdown-item">
-                        <i class="fa fa-wrench"></i> Settings
                     </a>
 
                     <a href="{{ path('logout') }}" class="dropdown-item">

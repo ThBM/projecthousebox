@@ -2,18 +2,21 @@
 
 namespace App\Form;
 
-use App\Entity\Projet;
+use App\Entity\Contact;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProjetType extends AbstractType
+class ContactType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nom', TextType::class)
+            ->add('nom')
+            ->add('prenom')
+            ->add('fonction')
+            ->add('email')
+            ->add('telephone')
         ;
     }
 
@@ -21,7 +24,7 @@ class ProjetType extends AbstractType
     {
         $resolver->setDefaults([
             // uncomment if you want to bind to a class
-            //'data_class' => Projet::class,
+            'data_class' => Contact::class,
         ]);
     }
 }

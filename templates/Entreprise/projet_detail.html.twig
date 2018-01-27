@@ -6,10 +6,12 @@
         <div class="col">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-folder-open"></i></span>
+                    <span class="input-group-text"><i class="fa fa-folder-open"></i> Liste des projets</span>
                 </div>
-                <select name="projet" id="" class="form-control">
-                    <option value="">projet</option>
+                <select name="projet" id="projetsList" class="form-control">
+                    {% for projet_option in app.user.projets %}
+                        <option value="{{ projet_option.id }}" {% if projet_option.id == projet.id %} selected {% endif %} >{{ projet_option.nom }}</option>
+                    {% endfor %}
                 </select>
                 <div class="input-group-btn">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Filtre
@@ -32,6 +34,9 @@
                     <a href="{{ path('entreprise_projets_show', {id: projet.id}) }}" class="nav-link {% if tabSelected|default("projet") == "projet" %} active {% endif %}"><i class="fa fa-folder-open"></i> Projet</a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ path('entreprise_projets_clients', {id: projet.id}) }}" class="nav-link {% if tabSelected == "clients" %} active {% endif %}"><i class="fa fa-users"></i> Contacts société</a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ path('entreprise_projets_clients', {id: projet.id}) }}" class="nav-link {% if tabSelected == "clients" %} active {% endif %}"><i class="fa fa-users"></i> Clients</a>
                 </li>
                 <li class="nav-item">
@@ -48,4 +53,16 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function(){
+            $("#projetsList").change(function () {
+                document.location.href = "/entreprise/projets/" + $(this).val();
+            });
+        });
+    </script>
 {% endblock %}
