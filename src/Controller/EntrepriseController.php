@@ -10,15 +10,18 @@ namespace App\Controller;
 
 
 use App\Entity\Contact;
+use App\Entity\Document;
 use App\Entity\Entreprise;
 use App\Entity\Projet;
 use App\Form\ContactType;
+use App\Form\DocumentType;
 use App\Form\EntrepriseProfilType;
 use App\Form\ProjetAddType;
 use App\Form\ProjetEditType;
 use App\Repository\ProjetRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use function Sodium\add;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,15 +115,87 @@ class EntrepriseController extends Controller
     /**
      * @Route("/entreprise/projets/{id}/documents", name="entreprise_projets_documents")
      */
-    public function showProjetDocuments($id, ObjectManager $em) {
-        $projet = $em->getRepository(Projet::class)->find($id);
+    public function showProjetDocuments($id, ObjectManager $manager, Request $request) {
+        $projet = $manager->getRepository(Projet::class)->find($id);
 
         if($projet->getEntreprise() != $this->getUser()) {
             $this->addFlash("danger", "Ce projet ne vous appartient pas.");
             return $this->redirectToRoute("entreprise_home");
         }
 
-        return $this->render("Entreprise/projet_documents.html.twig", ["projet" => $projet]);
+        $document = new Document();
+        $form = $this->createForm(DocumentType::class, $document);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()) {
+            $document->setProjet($projet);
+            $manager->persist($document);
+            $manager->flush();
+            $this->addFlash("success", "Le document a été ajouté.");
+        }
+
+        return $this->render("Entreprise/projet_documents.html.twig", [
+            "projet" => $projet,
+            "form" => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/entreprise/documents/remove/{id}", name="entreprise_documents_remove")
+     */
+    public function removeDocument($id, ObjectManager $manager) {
+        $document = $manager->getRepository(Document::class)->find($id);
+
+        if(!$document) {
+            $this->addFlash("warning", "Le document n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        /** @var Entreprise $entreprise */
+        $entreprise = $this->getUser();
+        /** @var Projet $projet */
+        $projet = $document->getProjet();
+
+        if($projet->getEntreprise() != $entreprise) {
+            $this->addFlash("warning", "Vous n'êtes pas autorisé à modifier ce document.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        $manager->remove($document);
+        $manager->flush();
+        $this->addFlash("success", "Le document a été supprimé.");
+
+        return $this->redirectToRoute("entreprise_projets_documents", ["id" => $projet->getId()]);
+    }
+
+    /**
+     * @Route("/entreprise/documents/{id}", name="entreprise_documents_edit")
+     */
+    public function editDocument($id, Request $request, ObjectManager $manager) {
+        $document = $manager->getRepository(Document::class)->find($id);
+
+        if(!$document) {
+            $this->addFlash("warning", "Le document n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        /** @var Entreprise $entreprise */
+        $entreprise = $this->getUser();
+        /** @var Projet $projet */
+        $projet = $document->getProjet();
+
+        if($projet->getEntreprise() != $entreprise) {
+            $this->addFlash("warning", "Vous n'êtes pas autorisé à modifier ce document.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        $form = $this->createForm(DocumentType::class, $document);
+
+
+
+        $this->addFlash("success", "Le document a été supprimé.");
+
+        return $this->redirectToRoute("entreprise_projets_documents", ["id" => $projet->getId()]);
     }
 
     /**

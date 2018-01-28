@@ -22,22 +22,26 @@
             <tr>
                 <th>Date d'ajout</th>
                 <th>Type</th>
-                <th>Nom</th>
+                <th>Commentaires</th>
+                <th style="width: 1px;"></th>
                 <th style="width: 1px;"></th>
                 <th style="width: 1px;"></th>
             </tr>
             </thead>
             <tbody>
-            {% for projet in 1..100 %}
+            {% for document in projet.documents %}
                 <tr>
-                    <td>{{ projet }}</td>
-                    <td>{{ projet }}</td>
-                    <td></td>
+                    <td>{{ document.date|date('d/m/Y') }}</td>
+                    <td>{{ document.type }}</td>
+                    <td>{{ document.commentaires }}</td>
                     <td class="text-right text-white">
-                        <a href="{{ path('entreprise_projets_show', {"id": projet }) }}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Voir</a>
+                        <a href="{{ path('entreprise_projets_show', {"id": projet.id }) }}" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
                     </td>
                     <td class="text-right text-white">
-                        <a href="{{ path('entreprise_projets_remove', {"id": projet}) }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Supprimer</a>
+                        <a href="{{ path('entreprise_projets_show', {"id": projet.id }) }}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
+                    </td>
+                    <td class="text-right text-white">
+                        <a href="{{ path('entreprise_documents_remove', {"id": document.id }) }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -47,13 +51,13 @@
 
 
 
- {#
-    <div class="modal fade" id="modal-addProjet" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal fade" id="modal-addDocument" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             {{ form_start(form) }}
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Ajouter un projet</h5>
+                    <h5 class="modal-title">Ajouter un document</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -61,25 +65,35 @@
 
                 <div class="modal-body">
 
-                    {{ form_errors(form.nom) }}
+                    {{ form_errors(form.type) }}
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text">Nom</span>
+                            <span class="input-group-text">Type</span>
                         </div>
-                        {{ form_widget(form.nom) }}
+                        {{ form_widget(form.type) }}
                     </div>
+
+                    {{ form_errors(form.commentaires) }}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text h-100">Commentaires</span>
+                        </div>
+                        {{ form_widget(form.commentaires) }}
+                    </div>
+
+                    {{ form_row(form.fichierFile) }}
 
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-link" data-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Ajouter le projet</button>
+                    <button type="submit" class="btn btn-primary">Ajouter le document</button>
                 </div>
             </div>
             {{ form_end(form) }}
         </div>
     </div>
-#}
+
 {% endblock %}
 
 
