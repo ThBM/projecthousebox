@@ -2,22 +2,22 @@
 
 namespace App\Form;
 
-use App\Entity\Document;
+use App\Entity\Photo;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Vich\UploaderBundle\Form\Type\VichFileType;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
-class DocumentType extends AbstractType
+class PhotoType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("type", TextType::class)
+            ->add("titre", TextType::class)
             ->add("commentaires", TextareaType::class)
-            ->add('fichierFile', VichFileType::class)
+            ->add('photoFile', VichImageType::class)
         ;
     }
 
@@ -25,7 +25,7 @@ class DocumentType extends AbstractType
     {
         $resolver->setDefaults([
             // uncomment if you want to bind to a class
-            'data_class' => Document::class,
+            'data_class' => Photo::class,
         ]);
     }
 }

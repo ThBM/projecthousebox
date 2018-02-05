@@ -2,15 +2,14 @@
 
 namespace App\Form;
 
-use App\Entity\Entreprise;
+use App\Entity\Client;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Vich\UploaderBundle\Form\Type\VichFileType;
 
-class EntrepriseProfilType extends AbstractType
+class ClientProfilType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -18,26 +17,20 @@ class EntrepriseProfilType extends AbstractType
             ->add('nom', TextType::class, [
                 "label" => false,
                 "attr" => [
-                    "placeholder" => "Nom de la société"
+                    "placeholder" => "Nom"
+                ]
+            ])
+            ->add('prenom', TextType::class, [
+                "label" => false,
+                "attr" => [
+                    "placeholder" => "Prénom"
                 ]
             ])
             ->add("adresse", TextareaType::class, [
                 "label" => false,
                 "attr" => [
-                    "placeholder" => "Adresse de la société"
+                    "placeholder" => "Adresse"
                 ]
-            ])
-            ->add('siren', TextType::class, [
-                "label" => false,
-                "attr" => [
-                    "placeholder" => "SIREN (9 chiffres)",
-                    "pattern" => "^[0-9]{9}$",
-                    "title" => "Le SIREN doit contenir 9 chiffres."
-                ]
-            ])
-            ->add('logoFile', VichFileType::class, [
-                "allow_delete" => false,
-                "download_label" => false
             ])
         ;
     }
@@ -46,7 +39,7 @@ class EntrepriseProfilType extends AbstractType
     {
         $resolver->setDefaults([
             // uncomment if you want to bind to a class
-            'data_class' => Entreprise::class,
+            'data_class' => Client::class,
         ]);
     }
 }

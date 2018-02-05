@@ -7,3 +7,14 @@ vich_uploader:
             upload_destination: '%kernel.project_dir%/public/uploads/documents'
             namer:
                 service: "vich_uploader.namer_uniqid"
+        logo_fichier:
+            uri_prefix: /uploads/logos
+            upload_destination: '%kernel.project_dir%/public/uploads/logos'
+            delete_on_update: true
+            namer:
+                service: "vich_uploader.namer_uniqid"
+        photo_fichier:
+            uri_prefix: /uploads/photos
+            upload_destination: '%kernel.project_dir%/public/uploads/photos'
+            namer:
+                service: "vich_uploader.namer_uniqid"

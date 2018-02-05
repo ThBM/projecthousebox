@@ -6,10 +6,16 @@ security:
             entity:
                 class: App\Entity\Entreprise
                 property: email
+        client:
+            entity:
+                class: App\Entity\Client
+                property: email
 
     encoders:
         App\Entity\Entreprise:
             algorithm: bcrypt
+        App\Entity\Client:
+                    algorithm: bcrypt
 
     firewalls:
         dev:
@@ -21,6 +27,15 @@ security:
             form_login:
                 login_path: security_login_entreprise
                 check_path: entreprise_login_check
+            logout:
+                path: logout
+                target: /
+        client:
+            pattern: ^/client
+            provider: client
+            form_login:
+                login_path: security_login_client
+                check_path: client_login_check
             logout:
                 path: logout
                 target: /

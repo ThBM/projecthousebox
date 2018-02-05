@@ -1,3 +1,15 @@
 .invalid-feedback {
     display: inherit;
 }
+
+.flashes-container {
+    position: fixed;
+    bottom: 10px;
+    right: 32px;
+    left: 32px;
+    z-index: 1;
+    display: none;
+}
+.flashes-container .flashes {
+    float: right;
+}

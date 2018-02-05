@@ -1,0 +1,37 @@
+{% extends "Client/projet_detail.html.twig" %}
+{% set tabSelected = "projet" %}
+
+{% block tabContent %}
+    {{ form_start(form) }}
+        {{ form_errors(form.nom) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nom du projet</span>
+            </div>
+            {{ form_widget(form.nom, {"disabled" : "disabled"}) }}
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Date de création</span>
+            </div>
+            <input type="text" class="form-control" disabled value="{{ projet.date|date("d/m/Y") }}">
+        </div>
+
+        {{ form_errors(form.statut) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Statut du projet</span>
+            </div>
+            {{ form_widget(form.statut, {"disabled" : "disabled"}) }}
+        </div>
+
+        {{ form_errors(form.description) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text h-100">Description</span>
+            </div>
+            {{ form_widget(form.description, {"disabled" : "disabled"}) }}
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

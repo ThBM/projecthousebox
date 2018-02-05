@@ -1,4 +1,4 @@
-{% extends "Entreprise/base.html.twig" %}
+{% extends "Client/base.html.twig" %}
 
 {% block body %}
 
@@ -9,8 +9,8 @@
                     <span class="input-group-text"><i class="fa fa-folder-open"></i> Liste des projets</span>
                 </div>
                 <select name="projet" id="projetsList" class="form-control">
-                    {% for projet_option in app.user.projets %}
-                        <option value="{{ projet_option.id }}" {% if projet_option.id == projet.id %} selected {% endif %} >{{ projet_option.nom }}</option>
+                    {% for clientProjet in app.user.clientProjet %}
+                        <option value="{{ clientProjet.projet.id }}" {% if clientProjet.projet.id == projet.id %} selected {% endif %} >{{ clientProjet.projet.nom }}</option>
                     {% endfor %}
                 </select>
                 <div class="input-group-btn">
@@ -35,19 +35,19 @@
         <div class="col">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a href="{{ path('entreprise_projets_show', {id: projet.id}) }}" class="nav-link {% if tabSelected|default("projet") == "projet" %} active {% endif %}"><i class="fa fa-folder-open"></i> Projet</a>
+                    <a href="{{ path('client_projets_show', {id: projet.id}) }}" class="nav-link {% if tabSelected|default("projet") == "projet" %} active {% endif %}"><i class="fa fa-folder-open"></i> Projet</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ path('entreprise_projets_contacts', {id: projet.id}) }}" class="nav-link {% if tabSelected == "contacts" %} active {% endif %}"><i class="fa fa-users"></i> Contacts société</a>
+                    <a href="{{ path('client_projets_entreprise', {id: projet.id}) }}" class="nav-link {% if tabSelected == "entreprise" %} active {% endif %}"><i class="fa fa-building"></i> Société</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ path('entreprise_projets_clients', {id: projet.id}) }}" class="nav-link {% if tabSelected == "clients" %} active {% endif %}"><i class="fa fa-users"></i> Clients</a>
+                    <a href="{{ path('client_projets_contacts', {id: projet.id}) }}" class="nav-link {% if tabSelected == "contacts" %} active {% endif %}"><i class="fa fa-users"></i> Contacts société</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ path('entreprise_projets_documents', {id: projet.id}) }}" class="nav-link {% if tabSelected == "documents" %} active {% endif %}"><i class="fa fa-file"></i> Documents</a>
+                    <a href="{{ path('client_projets_documents', {id: projet.id}) }}" class="nav-link {% if tabSelected == "documents" %} active {% endif %}"><i class="fa fa-file"></i> Documents</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ path('entreprise_projets_photos', {id: projet.id}) }}" class="nav-link {% if tabSelected == "photos" %} active {% endif %}"><i class="fa fa-images"></i> Photos</a>
+                    <a href="{{ path('client_projets_photos', {id: projet.id}) }}" class="nav-link {% if tabSelected == "photos" %} active {% endif %}"><i class="fa fa-images"></i> Photos</a>
                 </li>
             </ul>
 
@@ -68,7 +68,7 @@
     <script>
         $(document).ready(function(){
             $("#projetsList").change(function () {
-                document.location.href = "/entreprise/projets/" + $(this).val();
+                document.location.href = "/client/projets/" + $(this).val();
             });
         });
     </script>

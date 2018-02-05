@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Projet
 {
 
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -44,9 +43,24 @@ class Projet
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Document", mappedBy="projet")
+     * @ORM\OneToMany(targetEntity="App\Entity\Document", mappedBy="projet", cascade={"persist", "remove"})
      */
     private $documents;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Photo", mappedBy="projet", cascade={"persist", "remove"})
+     */
+    private $photos;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Contact", mappedBy="projets")
+     */
+    private $contacts;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ClientProjet", mappedBy="projet", cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    private $clientProjet;
 
     /**
      * Projet constructor.
@@ -154,21 +168,94 @@ class Projet
         $this->description = $description;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getDocuments()
     {
         return $this->documents;
     }
 
-    /**
-     * @param mixed $documents
-     */
+
     public function setDocuments($documents): void
     {
         $this->documents = $documents;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getPhotos()
+    {
+        return $this->photos;
+    }
 
+    /**
+     * @param mixed $photos
+     */
+    public function setPhotos($photos): void
+    {
+        $this->photos = $photos;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getContacts()
+    {
+        return $this->contacts;
+    }
+
+    /**
+     * @param mixed $contacts
+     */
+    public function setContacts($contacts): void
+    {
+        $this->contacts = $contacts;
+    }
+
+    public function addContact(Contact $contact) {
+        if ($this->contacts->contains($contact)) {
+            return;
+        }
+
+        $this->contacts[] = $contact;
+        $contact->addProjet($this);
+    }
+
+
+    public function removeContact(Contact $contact) {
+        if (!$this->contacts->contains($contact)) {
+            return;
+        }
+        $this->contacts->removeElement($contact);
+        $contact->removeProjet($this);
+    }
+
+
+
+    /**
+     * @return mixed
+     */
+    public function getClientProjet()
+    {
+        return $this->clientProjet;
+    }
+
+    /**
+     * @param mixed $clientProjet
+     */
+    public function setClientProjet($clientProjet): void
+    {
+        $this->clientProjet = $clientProjet;
+    }
+
+    public function addClientProjet(ClientProjet $clientProjet) {
+        $this->clientProjet[] = $clientProjet;
+        $clientProjet->setProjet($this);
+    }
+
+    public function removeClientProjet(ClientProjet $clientProjet) {
+        $this->clientProjet->removeElement($clientProjet);
+        $clientProjet->setProjet(null);
+    }
 }

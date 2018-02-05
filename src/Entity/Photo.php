@@ -8,10 +8,10 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\DocumentRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\PhotoRepository")
  * @Vich\Uploadable()
  */
-class Document implements \Serializable
+class Photo implements \Serializable
 {
     /**
      * @ORM\Id
@@ -28,7 +28,7 @@ class Document implements \Serializable
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $type;
+    private $titre;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -38,17 +38,17 @@ class Document implements \Serializable
     /**
      * @ORM\Column(type="string", length=500)
      */
-    private $fichier;
+    private $photo;
 
     /**
-     * @Vich\UploadableField(mapping="document_fichier", fileNameProperty="fichier")
-     * @Assert\File(maxSize="10M", maxSizeMessage="Le document ne doit pas dépasser 10M.", mimeTypes={"application/pdf"}, mimeTypesMessage="Le fichier doit être un document PDF.")
+     * @Vich\UploadableField(mapping="photo_fichier", fileNameProperty="photo")
+     * @Assert\File(maxSize="10M", maxSizeMessage="Le document ne doit pas dépasser 10M.")
      * @var File
      */
-    private $fichierFile;
+    private $photoFile;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Projet", inversedBy="documents")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Projet", inversedBy="photos")
      */
     private $projet;
 
@@ -87,17 +87,17 @@ class Document implements \Serializable
     /**
      * @return mixed
      */
-    public function getType()
+    public function getTitre()
     {
-        return $this->type;
+        return $this->titre;
     }
 
     /**
-     * @param mixed $type
+     * @param mixed $titre
      */
-    public function setType($type): void
+    public function setTitre($titre): void
     {
-        $this->type = $type;
+        $this->titre = $titre;
     }
 
     /**
@@ -119,18 +119,37 @@ class Document implements \Serializable
     /**
      * @return mixed
      */
-    public function getFichier()
+    public function getPhoto()
     {
-        return $this->fichier;
+        return $this->photo;
     }
 
     /**
-     * @param mixed $fichier
+     * @param mixed $photo
      */
-    public function setFichier($fichier): void
+    public function setPhoto($photo): void
     {
-        $this->fichier = $fichier;
+        $this->photo = $photo;
     }
+
+    /**
+     * @return File
+     */
+    public function getPhotoFile()
+    {
+        return $this->photoFile;
+    }
+
+    /**
+     * @param File $photoFile
+     */
+    public function setPhotoFile(File $photoFile): void
+    {
+        $this->date = new \DateTime();
+        $this->photoFile = $photoFile;
+    }
+
+
 
     /**
      * @return mixed
@@ -148,22 +167,6 @@ class Document implements \Serializable
         $this->projet = $projet;
     }
 
-    /**
-     * @return File
-     */
-    public function getFichierFile()
-    {
-        return $this->fichierFile;
-    }
-
-    /**
-     * @param File $fichierFile
-     */
-    public function setFichierFile(File $fichierFile): void
-    {
-        $this->date = new \DateTime();
-        $this->fichierFile = $fichierFile;
-    }
 
 
     /**
@@ -177,9 +180,9 @@ class Document implements \Serializable
         return serialize([
             $this->id,
             $this->date,
-            $this->type,
+            $this->titre,
             $this->commentaires,
-            $this->fichier
+            $this->photo
         ]);
     }
 
@@ -197,9 +200,9 @@ class Document implements \Serializable
         list(
             $this->id,
             $this->date,
-            $this->type,
+            $this->titre,
             $this->commentaires,
-            $this->fichier
-        ) = unserialize($serialized);
+            $this->photo
+            ) = unserialize($serialized);
     }
 }

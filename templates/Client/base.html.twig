@@ -15,7 +15,7 @@
 <div class="page-wrapper">
     <nav class="navbar page-header">
 
-        <a class="navbar-brand" href="{{ path('entreprise_home') }}">
+        <a class="navbar-brand" href="{{ path('client_home') }}">
             <img src="{{ asset("assets/imgs/houseboxLogo.png") }}" alt="logo" style="height: 40px;">
         </a>
 
@@ -37,17 +37,17 @@
             #}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img src="{{ (app.user.logo) ? vich_uploader_asset(app.user, "logoFile") : asset("assets/imgs/avatar-1.png") }}" class="avatar avatar-sm" alt="logo">
+                    <img src="{{ asset("assets/imgs/avatar-1.png") }}" class="avatar avatar-sm" alt="logo">
                     <span class="small ml-1 d-md-down-none">{{ app.user.email }}</span>
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-right">
 
-                    <a href="{{ path('entreprise_home') }}" class="dropdown-item">
+                    <a href="{{ path('client_home') }}" class="dropdown-item">
                         <i class="fa fa-folder-open"></i> Projets
                     </a>
 
-                    <a href="{{ path('entreprise_profil') }}" class="dropdown-item">
+                    <a href="{{ path('client_profil') }}" class="dropdown-item">
                         <i class="fa fa-user"></i> Profil
                     </a>
 

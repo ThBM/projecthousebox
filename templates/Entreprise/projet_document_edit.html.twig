@@ -1,56 +1,29 @@
-{% extends "Entreprise/base.html.twig" %}
+{% extends "Entreprise/projet_detail.html.twig" %}
+{% set tabSelected = "documents" %}
 
-{% block body %}
-    <div class="card">
-        {{ form_start(form) }}
-        <div class="card-header">
-            <h1>{{ action }} un contact</h1>
+{% block tabContent %}
+    {{ form_start(form) }}
+
+        {{ form_errors(form.type) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nom</span>
+            </div>
+            {{ form_widget(form.type) }}
         </div>
-        <div class="card-body">
-            {{ form_errors(form.nom) }}
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Nom</span>
-                </div>
-                {{ form_widget(form.nom) }}
-            </div>
 
-            {{ form_errors(form.prenom) }}
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Prénom</span>
-                </div>
-                {{ form_widget(form.prenom) }}
+        {{ form_errors(form.commentaires) }}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text h-100">Commentaires</span>
             </div>
-
-            {{ form_errors(form.fonction) }}
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Fonction</span>
-                </div>
-                {{ form_widget(form.fonction) }}
-            </div>
-
-            {{ form_errors(form.email) }}
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">@</span>
-                </div>
-                {{ form_widget(form.email) }}
-            </div>
-
-            {{ form_errors(form.telephone) }}
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                </div>
-                {{ form_widget(form.telephone) }}
-            </div>
+            {{ form_widget(form.commentaires) }}
         </div>
-        <div class="card-footer text-right">
-            <a class="btn btn-link" href="{{ path('entreprise_contacts') }}">Annuler</a>
-            <button type="submit" class="btn btn-primary">{{ action }} le contact</button>
+
+        <div class="text-right">
+            <a class="btn btn-link" href="{{ path('entreprise_projets_documents', {"id" : projet.id}) }}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Modifier le document</button>
         </div>
-        {{ form_end(form) }}
-    </div>
+
+    {{ form_end(form) }}
 {% endblock %}

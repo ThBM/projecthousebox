@@ -1,0 +1,25 @@
+{% extends "Client/projet_detail.html.twig" %}
+{% set tabSelected = "entreprise" %}
+
+{% block tabContent %}
+    <div class="row">
+    {% if projet.entreprise.logo %}
+        <div class="col-md-4">
+            <img src="{{ vich_uploader_asset(projet.entreprise, "logoFile") }}" style="width: 100%"><br /><br>
+        </div>
+    {% endif %}
+        <div class="col-md">
+            <h1>{{ projet.entreprise.nom }}</h1>
+            <p>
+                {{ projet.entreprise.adresse|nl2br }}
+            </p>
+            <p>
+                SIREN : {{ projet.entreprise.siren }}
+            </p>
+            <p>
+                Email : {{ projet.entreprise.email }}
+            </p>
+        </div>
+
+    </div>
+{% endblock %}

@@ -2,5 +2,143 @@
 {% set tabSelected = "clients" %}
 
 {% block tabContent %}
-    TODO
+    <div class="row justify-content-center mb-3 pl-3 pr-3">
+        <div class="col">
+            <div class="input-group mr-5 align-content-center">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                </div>
+                <input type="search" class="form-control" placeholder="Rechercher" id="search">
+            </div>
+        </div>
+        <div class="col text-right">
+            <a class="btn btn-success text-white" data-toggle="modal" data-target="#modal-addClient">Ajouter un client</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped" id="tableProjets">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th style="width: 1px;"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for clientProjet in projet.clientProjet %}
+                <tr>
+                    <td>{{ clientProjet.isAcceptedByClient ? clientProjet.client.nom }}</td>
+                    <td>{{ clientProjet.isAcceptedByClient ? clientProjet.client.prenom }}</td>
+                    <td>{{ clientProjet.client.email }}</td>
+                    <td>{{ clientProjet.isAcceptedByClient ? "Invitation acceptée" : "Invitation en attente" }}</td>
+                    <td class="text-right text-white">
+                        <a data-client="{{ clientProjet.client.nom }} {{ clientProjet.client.prenom }}" data-url="{{ path('entreprise_projets_clients_remove', {"id": projet.id, "clientProjet_id": clientProjet.id}) }}" class="btn btn-sm btn-danger remove"><i class="fa fa-trash"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="modal fade" id="modal-addClient" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un client</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <p>
+                        Une invitation au projet sera envoyée à cette adresse email. Le client pourra accéder au projet et à tous les documents de celui-ci.
+                    </p>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">@</span>
+                        </div>
+                        <input type="text" class="form-control" name="client_email">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter le client au projet</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-removeClient" tabindex="-1" role="dialog" aria-labelledby="removeClient" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Supprimer un client du projet</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    Voulez-vous vraiment supprimer le projet <b id="client-name"></b> ? Il n'aura plus accès au projet.
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Annuler</button>
+                    <a class="btn btn-danger text-white" id="removeConfirmed" >Supprimer le client du projet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $.fn.dataTable.ext.search.push(function( settings, data, dataIndex ) {
+            var search = $("#search").val();
+            var regex = new RegExp(search, "i");
+
+            var length = data.length;
+
+            for(i=0; i<length-2; i++) {
+                if(data[i].match(regex)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        $(document).ready(function(){
+            var table = $('#tableProjets').DataTable({
+                "language": { url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"},
+                "dom": 'tp'
+            });
+
+            $('#search').keyup(function () {
+                table.draw();
+            })
+
+            $(".remove").click(function(e) {
+                e.preventDefault();
+                var client = $(this).data("client");
+                var url = $(this).data("url");
+
+                $("#modal-removeClient #removeConfirmed").attr("href", url);
+                $("#modal-removeClient #client-name").text(client);
+                $("#modal-removeClient").modal();
+            })
+        });
+
+    </script>
 {% endblock %}

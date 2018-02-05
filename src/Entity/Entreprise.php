@@ -5,11 +5,14 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EntrepriseRepository")
+ * @Vich\Uploadable()
  */
-class Entreprise implements AdvancedUserInterface
+class Entreprise implements AdvancedUserInterface, \Serializable
 {
     /**
      * @ORM\Id
@@ -71,6 +74,29 @@ class Entreprise implements AdvancedUserInterface
      * @ORM\OneToMany(targetEntity="App\Entity\Contact", mappedBy="entreprise")
      */
     private $contacts;
+
+    /**
+     * @ORM\Column(type="string", length=300, nullable=true)
+     * @Assert\Email()
+     */
+    private $newEmail;
+
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    private $logo;
+
+    /**
+     * @Vich\UploadableField(mapping="logo_fichier", fileNameProperty="logo")
+     * @Assert\File(maxSize="10M", maxSizeMessage="Le document ne doit pas dépasser 10M.")
+     * @var File
+     */
+    private $logoFile;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $logoUploadedAt;
 
     /**
      * @return mixed
@@ -324,5 +350,122 @@ class Entreprise implements AdvancedUserInterface
         $this->siren = $siren;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getNewEmail()
+    {
+        return $this->newEmail;
+    }
 
+    /**
+     * @param mixed $newEmail
+     */
+    public function setNewEmail($newEmail): void
+    {
+        $this->newEmail = $newEmail;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLogo()
+    {
+        return $this->logo;
+    }
+
+    /**
+     * @param mixed $logo
+     */
+    public function setLogo($logo): void
+    {
+        $this->logo = $logo;
+    }
+
+    /**
+     * @return File
+     */
+    public function getLogoFile()
+    {
+        return $this->logoFile;
+    }
+
+    /**
+     * @param File $logoFile
+     */
+    public function setLogoFile(File $logoFile): void
+    {
+        $this->setLogoUploadedAt(new \DateTime());
+        $this->logoFile = $logoFile;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLogoUploadedAt()
+    {
+        return $this->logoUploadedAt;
+    }
+
+    /**
+     * @param mixed $logoUploadedAt
+     */
+    public function setLogoUploadedAt($logoUploadedAt): void
+    {
+        $this->logoUploadedAt = $logoUploadedAt;
+    }
+
+
+    /**
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     * @since 5.1.0
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->id,
+            $this->email,
+            $this->nom,
+            $this->password,
+            $this->roles,
+            $this->isActive,
+            $this->newEmail,
+            $this->projets,
+            $this->contacts,
+            $this->siren,
+            $this->adresse,
+            $this->activationKey,
+            $this->logo
+        ]);
+    }
+
+    /**
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     * @since 5.1.0
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->id,
+            $this->email,
+            $this->nom,
+            $this->password,
+            $this->roles,
+            $this->isActive,
+            $this->newEmail,
+            $this->projets,
+            $this->contacts,
+            $this->siren,
+            $this->adresse,
+            $this->activationKey,
+            $this->logo
+            ) = unserialize($serialized);
+    }
 }

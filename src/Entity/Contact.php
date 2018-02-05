@@ -50,6 +50,11 @@ class Contact
     private $entreprise;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Projet", inversedBy="contacts")
+     */
+    private $projets;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -161,5 +166,37 @@ class Contact
         $this->entreprise = $entreprise;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getProjets()
+    {
+        return $this->projets;
+    }
 
+    /**
+     * @param mixed $projets
+     */
+    public function setProjets($projets): void
+    {
+        $this->projets = $projets;
+    }
+
+    public function addProjet(Projet $projet) {
+        if ($this->projets->contains($projet)) {
+            return;
+        }
+
+        $this->projets[] = $projet;
+        $projet->addContact($this);
+    }
+
+    public function removeProjet(Projet $projet) {
+        if (!$this->projets->contains($projet)) {
+            return;
+        }
+
+        $this->projets->removeElement($projet);
+        $projet->removeContact($this);
+    }
 }

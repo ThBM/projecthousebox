@@ -1,4 +1,4 @@
-{% extends "Entreprise/projet_detail.html.twig" %}
+{% extends "Client/projet_detail.html.twig" %}
 {% set tabSelected = "documents" %}
 
 {% block tabContent %}
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="col text-right">
-            <a class="btn btn-success text-white" data-toggle="modal" data-target="#modal-addDocument">Ajouter un document</a>
+
         </div>
     </div>
 
@@ -24,8 +24,6 @@
                 <th>Type</th>
                 <th>Commentaires</th>
                 <th style="width: 1px;"></th>
-                <th style="width: 1px;"></th>
-                <th style="width: 1px;"></th>
             </tr>
             </thead>
             <tbody>
@@ -35,13 +33,7 @@
                     <td>{{ document.type }}</td>
                     <td>{{ document.commentaires }}</td>
                     <td class="text-right text-white">
-                        <a data-url="{{ path('entreprise_documents_view', {"id": document.id }) }}" class="btn btn-sm btn-primary viewDocument" data-toggle="modal" data-target="#modal-viewDocument"><i class="fa fa-eye"></i></a>
-                    </td>
-                    <td class="text-right text-white">
-                        <a href="{{ path('entreprise_documents_edit', {"id": document.id }) }}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
-                    </td>
-                    <td class="text-right text-white">
-                        <a href="{{ path('entreprise_documents_remove', {"id": document.id }) }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
+                        <a data-url="{{ path('client_documents_view', {"id": document.id }) }}" class="btn btn-sm btn-primary viewDocument" data-toggle="modal" data-target="#modal-viewDocument"><i class="fa fa-eye"></i></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -49,50 +41,6 @@
         </table>
     </div>
 
-
-
-
-    <div class="modal fade" id="modal-addDocument" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            {{ form_start(form) }}
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Ajouter un document</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-
-                    {{ form_errors(form.type) }}
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Type</span>
-                        </div>
-                        {{ form_widget(form.type) }}
-                    </div>
-
-                    {{ form_errors(form.commentaires) }}
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text h-100">Commentaires</span>
-                        </div>
-                        {{ form_widget(form.commentaires) }}
-                    </div>
-
-                    {{ form_row(form.fichierFile) }}
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-link" data-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Ajouter le document</button>
-                </div>
-            </div>
-            {{ form_end(form) }}
-        </div>
-    </div>
 
 
     <div class="modal fade" id="modal-viewDocument" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -146,6 +94,7 @@
             });
 
             $(".viewDocument").click(function() {
+                $("iframe").attr("src", "");
                 $("iframe").attr("src", $(this).data("url"));
 
                 /*$("#modal-viewDocument .modal-body").html("chargement");

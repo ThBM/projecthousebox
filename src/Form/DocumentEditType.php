@@ -4,20 +4,20 @@ namespace App\Form;
 
 use App\Entity\Document;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
-class DocumentType extends AbstractType
+class DocumentEditType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add("type", TextType::class)
             ->add("commentaires", TextareaType::class)
-            ->add('fichierFile', VichFileType::class)
         ;
     }
 

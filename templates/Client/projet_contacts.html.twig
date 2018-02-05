@@ -1,0 +1,99 @@
+{% extends "Client/projet_detail.html.twig" %}
+{% set tabSelected = "contacts" %}
+
+{% block tabContent %}
+    <div class="row justify-content-center mb-3 pl-3 pr-3">
+        <div class="col">
+            <div class="input-group mr-5 align-content-center">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                </div>
+                <input type="search" class="form-control" placeholder="Rechercher" id="search">
+            </div>
+        </div>
+        <div class="col text-right">
+
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped" id="tableProjets">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Fonction</th>
+                <th style="width: 1px;"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for contact in projet.contacts %}
+                <tr>
+                    <td>{{ contact.nom }}</td>
+                    <td>{{ contact.prenom }}</td>
+                    <td>{{ contact.fonction }}</td>
+                    <td class="text-right text-white">
+                        <a data-url="{{ path('client_projets_contacts_show', {'id': projet.id, 'contact_id': contact.id}) }}" class="btn btn-sm btn-primary modal-contact"><i class="fa fa-eye"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="modal-contact" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Détail contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $.fn.dataTable.ext.search.push(function( settings, data, dataIndex ) {
+            var search = $("#search").val();
+            var regex = new RegExp(search, "i");
+
+            var length = data.length;
+
+            for(i=0; i<length-2; i++) {
+                if(data[i].match(regex)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        $(document).ready(function(){
+            var table = $('#tableProjets').DataTable({
+                "language": { url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"},
+                "dom": 'tp'
+            });
+
+            $('#search').keyup(function () {
+                table.draw();
+            });
+
+            $(".modal-contact").click(function() {
+                $.ajax($(this).data("url")).done(function(data) {
+                    $("#modal-contact .modal-body").html(data);
+                    $("#modal-contact").modal();
+                });
+            });
+
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "Entreprise/entreprise_detail.html.twig" %}
+{% set tabSelected = "identifiants" %}
+
+{% block tabContent %}
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Modifier l'email</h3>
+            <p>
+                {{ form_start(formEmail) }}
+
+                {{ form_errors(formEmail.newEmail.first) }}
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">@</span>
+                    </div>
+                    {{ form_widget(formEmail.newEmail.first) }}
+                </div>
+
+                {{ form_errors(formEmail.newEmail.second) }}
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">@</span>
+                    </div>
+                    {{ form_widget(formEmail.newEmail.second) }}
+                </div>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">Modifier l'email</button>
+                </div>
+                {{ form_end(formEmail) }}
+            </p>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Modifier le mot de passe</h3>
+            <p>
+                {{ form_start(formPassword) }}
+
+                {{ form_errors(formPassword.password) }}
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
+                </div>
+                {{ form_widget(formPassword.password) }}
+            </div>
+
+            {{ form_errors(formPassword.newPassword.first) }}
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
+                </div>
+                {{ form_widget(formPassword.newPassword.first) }}
+            </div>
+
+            {{ form_errors(formPassword.newPassword.second) }}
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
+                </div>
+                {{ form_widget(formPassword.newPassword.second) }}
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Modifier mon mot de passe</button>
+            </div>
+            {{ form_end(formPassword) }}
+            </p>
+        </div>
+
+    </div>
+
+{% endblock %}

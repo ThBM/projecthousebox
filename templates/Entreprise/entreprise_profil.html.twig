@@ -4,31 +4,52 @@
 {% block tabContent %}
     {{ form_start(form) }}
 
-        {{ form_errors(form.nom) }}
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Société</span>
+        <div class="row">
+            <div class="col-md-4">
+
+                <h3>Votre logo</h3>
+
+                {% if app.user.logo %}
+                    <img src="{{ vich_uploader_asset(app.user, "logoFile") }}" style="width: 100%"><br /><br>
+
+                    <a href="{{ path('entreprise_profil_remove_logo') }}" class="btn btn-danger">Supprimer le logo</a><br><br>
+                {% endif %}
+
+
+                {{ form_widget(form.logoFile) }}
             </div>
-            {{ form_widget(form.nom) }}
+
+            <div class="col-md-8">
+                {{ form_errors(form.nom) }}
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Société</span>
+                    </div>
+                    {{ form_widget(form.nom) }}
+                </div>
+
+                {{ form_errors(form.adresse) }}
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text h-100">Adresse</span>
+                    </div>
+                    {{ form_widget(form.adresse) }}
+                </div>
+
+                {{ form_errors(form.siren) }}
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">SIREN</span>
+                    </div>
+                    {{ form_widget(form.siren) }}
+                </div>
+            </div>
         </div>
 
-        {{ form_errors(form.adresse) }}
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Adresse</span>
-            </div>
-            {{ form_widget(form.adresse) }}
-        </div>
 
-        {{ form_errors(form.siren) }}
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Société</span>
-            </div>
-            {{ form_widget(form.siren) }}
-        </div>
         <div class="text-right">
             <button type="submit" class="btn btn-primary">Modifier mon profil société</button>
         </div>
+
     {{ form_end(form) }}
 {% endblock %}

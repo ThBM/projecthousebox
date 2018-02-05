@@ -9,22 +9,35 @@
 namespace App\Controller;
 
 
+use App\Entity\ChangeEmail;
+use App\Entity\ChangePassword;
+use App\Entity\Client;
+use App\Entity\ClientProjet;
 use App\Entity\Contact;
 use App\Entity\Document;
 use App\Entity\Entreprise;
+use App\Entity\Photo;
 use App\Entity\Projet;
+use App\Form\ChangeEmailType;
+use App\Form\ChangePasswordType;
 use App\Form\ContactType;
+use App\Form\DocumentEditType;
 use App\Form\DocumentType;
 use App\Form\EntrepriseProfilType;
+use App\Form\PhotoType;
+use App\Form\ProjetAddContactType;
 use App\Form\ProjetAddType;
 use App\Form\ProjetEditType;
-use App\Repository\ProjetRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use function Sodium\add;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
+use Vich\UploaderBundle\VichUploaderBundle;
 
 class EntrepriseController extends Controller
 {
@@ -41,6 +54,7 @@ class EntrepriseController extends Controller
             $projet->setEntreprise($this->getUser());
             $manager->persist($projet);
             $manager->flush();
+            $this->addFlash("success", "Le projet a été créé.");
 
             unset($projet);
             unset($form);
@@ -101,15 +115,135 @@ class EntrepriseController extends Controller
     /**
      * @Route("/entreprise/projets/{id}/clients", name="entreprise_projets_clients")
      */
-    public function showProjetClients($id, ObjectManager $em) {
-        $projet = $em->getRepository(Projet::class)->find($id);
+    public function showProjetClients($id, Request $request, ObjectManager $manager) {
+        $projet = $manager->getRepository(Projet::class)->find($id);
+
+        if(!$projet) {
+            $this->addFlash("danger", "Ce projet n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
 
         if($projet->getEntreprise() != $this->getUser()) {
             $this->addFlash("danger", "Ce projet ne vous appartient pas.");
             return $this->redirectToRoute("entreprise_home");
         }
 
+
+         if($request->getMethod() == "POST") {
+            if($client_email = $request->request->get("client_email")) {
+                $client = $manager->getRepository(Client::class)->findOneByEmail($client_email);
+                if(!$client) {
+                    // TODO : Ne pas signler que le client n'existe pas et créer un compte client + envoie du mail au client
+                    // TODO : Dire dans tous les cas : une invitation a été envoyée au client.
+                    $this->addFlash("warning", "Le client n'existe pas.");
+                } else {
+                    $clientProjet = new ClientProjet();
+                    $clientProjet->setClient($client);
+                    $clientProjet->setIsAcceptedByClient(false);
+                    $projet->addClientProjet($clientProjet);
+                    $this->addFlash("success", "Une invitation au projet à été envoyé au client.");
+                    $manager->flush();
+                }
+            }
+        }
+
+
         return $this->render("Entreprise/projet_clients.html.twig", ["projet" => $projet]);
+    }
+
+    /**
+     * @Route("/entreprise/projets/{id}/clients/remove/{clientProjet_id}", name="entreprise_projets_clients_remove")
+     */
+    public function removeClientFromProjet($id, $clientProjet_id, Request $request, ObjectManager $manager) {
+        $projet = $manager->getRepository(Projet::class)->find($id);
+
+        if(!$projet) {
+            $this->addFlash("danger", "Ce projet n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        if($projet->getEntreprise() != $this->getUser()) {
+            $this->addFlash("danger", "Ce projet ne vous appartient pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        $clientProjet = $manager->getRepository(ClientProjet::class)->find($clientProjet_id);
+        if(!$clientProjet) {
+            $this->addFlash("warning", "Le client n'existe pas.");
+        }
+
+
+        $projet->removeClientProjet($clientProjet);
+        $this->addFlash("success", "Le client a été retiré du projet.");
+        $manager->flush();
+
+        return $this->redirectToRoute("entreprise_projets_clients", ["id" => $projet->getId()]);
+    }
+
+    /**
+     * @Route("/entreprise/projets/{id}/contacts", name="entreprise_projets_contacts")
+     */
+    public function showProjetContacts($id, Request $request, ObjectManager $manager) {
+        $projet = $manager->getRepository(Projet::class)->find($id);
+
+        if(!$projet) {
+            $this->addFlash("danger", "Ce projet n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        if($projet->getEntreprise() != $this->getUser()) {
+            $this->addFlash("danger", "Ce projet ne vous appartient pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        if($request->getMethod() == "POST") {
+            if($contact_id = $request->request->get("contact_id")) {
+                $contact = $manager->getRepository(Contact::class)->find($contact_id);
+                if(!$contact) {
+                    $this->addFlash("warning", "Le contact n'existe pas.");
+                } else {
+                    if($contact->getEntreprise() != $this->getUser()) {
+                        $this->addFlash("warning", "Le contact ne vous appartient pas.");
+                    } else {
+                        $projet->addContact($contact);
+                        $manager->flush();
+                    }
+                }
+            }
+        }
+
+        return $this->render("Entreprise/projet_contacts.html.twig", [
+            "projet" => $projet
+        ]);
+    }
+
+    /**
+     * @Route("/entreprise/projets/{id}/contacts/remove/{id_contact}", name="entreprise_projets_contacts_remove")
+     */
+    public function removeContactFromProjet($id, $id_contact, ObjectManager $manager) {
+        $projet = $manager->getRepository(Projet::class)->find($id);
+
+        if(!$projet) {
+            $this->addFlash("danger", "Ce projet n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        if($projet->getEntreprise() != $this->getUser()) {
+            $this->addFlash("danger", "Ce projet ne vous appartient pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        $contact = $manager->getRepository(Contact::class)->find($id_contact);
+
+        if(!$contact) {
+            $this->addFlash("warning", "Ce contact n'existe pas.");
+        } else {
+            $projet->removeContact($contact);
+            $manager->flush();
+            $this->addFlash("success", "Le contact a été retiré de ce projet.");
+        }
+
+        return $this->redirectToRoute("entreprise_projets_contacts", ["id" => $projet->getId()]);
     }
 
     /**
@@ -132,6 +266,10 @@ class EntrepriseController extends Controller
             $manager->persist($document);
             $manager->flush();
             $this->addFlash("success", "Le document a été ajouté.");
+            unset($document);
+            unset($form);
+            $document = new Document();
+            $form = $this->createForm(DocumentType::class, $document);
         }
 
         return $this->render("Entreprise/projet_documents.html.twig", [
@@ -189,14 +327,101 @@ class EntrepriseController extends Controller
             return $this->redirectToRoute("entreprise_home");
         }
 
-        $form = $this->createForm(DocumentType::class, $document);
+        $form = $this->createForm(DocumentEditType::class, $document);
+        $form->handleRequest($request);
 
+        if($form->isSubmitted() && $form->isValid()) {
+            $manager->flush();
+            $this->addFlash("success", "Le document a été supprimé.");
+            return $this->redirectToRoute("entreprise_projets_documents", ["id" => $projet->getId()]);
+        }
 
-
-        $this->addFlash("success", "Le document a été supprimé.");
-
-        return $this->redirectToRoute("entreprise_projets_documents", ["id" => $projet->getId()]);
+        return $this->render("Entreprise/projet_document_edit.html.twig", ["form" => $form->createView(), "projet" => $projet]);
     }
+
+    /**
+     * @Route("/entreprise/documents/{id}/view", name="entreprise_documents_view")
+     */
+    public function viewDocument($id, ObjectManager $manager, UploaderHelper $helper) {
+        $document = $manager->getRepository(Document::class)->find($id);
+
+        if(!$document) {
+            return new Response("<body>Le document n'existe pas.</body>", 404);
+        }
+        if($document->getProjet()->getEntreprise() != $this->getUser()) {
+            return new Response("<body>Le document n'existe pas.</body>", 404);
+        }
+
+
+        $file = $helper->asset($document, 'fichierFile');
+
+        return new BinaryFileResponse("../public".$file);
+    }
+
+    /**
+     * @Route("/entreprise/projets/{id}/photos", name="entreprise_projets_photos")
+     */
+    public function showPhotosProjet($id, Request $request, ObjectManager $manager) {
+        $projet = $manager->getRepository(Projet::class)->find($id);
+
+        if(!$projet) {
+            $this->addFlash("danger", "Ce projet n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        if($projet->getEntreprise() != $this->getUser()) {
+            $this->addFlash("danger", "Ce projet ne vous appartient pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        $photo = new Photo();
+        $form = $this->createForm(PhotoType::class, $photo);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()) {
+            $photo->setProjet($projet);
+            $manager->persist($photo);
+            $manager->flush();
+
+            $this->addFlash("success", "La photo a été ajoutée.");
+
+            unset($form);
+            unset($photo);
+            $photo = new Photo();
+            $form = $this->createForm(PhotoType::class, $photo);
+        }
+
+
+        return $this->render("Entreprise/projet_photos.html.twig", [
+            "projet" => $projet,
+            "form" => $form->createView()
+        ]);
+
+    }
+
+    /**
+     * @Route("/entreprise/photo/{id}/remove", name="entreprise_projets_photos_remove")
+     */
+    public function removePhotoFromProjet($id, ObjectManager $manager) {
+        $photo = $manager->getRepository(Photo::class)->find($id);
+
+        if(!$photo) {
+            $this->addFlash("warning", "La photo n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        if($photo->getProjet()->getEntreprise() != $this->getUser()) {
+            $this->addFlash("warning", "La photo n'existe pas.");
+            return $this->redirectToRoute("entreprise_home");
+        }
+
+        $manager->remove($photo);
+        $manager->flush();
+
+        $this->addFlash("success", "La photo a été supprimé.");
+        return $this->redirectToRoute("entreprise_projets_photos", ["id" => $photo->getProjet()->getId()]);
+    }
+
 
     /**
      * @Route("/entreprise/profil", name="entreprise_profil")
@@ -216,6 +441,25 @@ class EntrepriseController extends Controller
         }
 
         return $this->render("Entreprise/entreprise_profil.html.twig", ["form" => $form->createView()]);
+    }
+
+    /**
+     * @Route("/entreprise/profil/removeLogo", name="entreprise_profil_remove_logo")
+     */
+    public function removeLogo(ObjectManager $manager, UploaderHelper $helper, Filesystem $filesystem) {
+        /** @var Entreprise $entreprise */
+        $entreprise = $this->getUser();
+
+        $file = $helper->asset($entreprise, 'logoFile');
+        $path = "../public".$file;
+        $filesystem->remove($path);
+
+        $entreprise->setLogo(null);
+        $this->addFlash("success", "Le logo a été supprimé.");
+        $manager->flush();
+
+
+        return $this->redirectToRoute("entreprise_profil");
     }
 
     /**
@@ -304,5 +548,55 @@ class EntrepriseController extends Controller
         }
 
         return $this->render("Entreprise/contact_edit.html.twig", ["form" => $form->createView(), "action" => "Ajouter"]);
+    }
+
+    /**
+     * @Route("/entreprise/identifiants", name="entreprise_identifiants")
+     */
+    public function identifiants(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder) {
+
+        $changePassword = new ChangePassword();
+        $formPassword = $this->createForm(ChangePasswordType::class, $changePassword);
+        $formPassword->handleRequest($request);
+
+        if($formPassword->isSubmitted() && $formPassword->isValid()) {
+            /** @var Entreprise $entreprise */
+            $entreprise = $this->getUser();
+            if(!$encoder->isPasswordValid($entreprise, $changePassword->getPassword())) {
+                $this->addFlash("warning", "Le mot de passe actuel ne correspond pas.");
+            } else {
+                $newPassword = $encoder->encodePassword($entreprise, $changePassword->getNewPassword());
+                $entreprise->setPassword($newPassword);
+                $manager->flush();
+                $this->addFlash("success", "Le mot de passe a été modifié.");
+            }
+        }
+
+        $changeEmail = new ChangeEmail();
+        $formEmail = $this->createForm(ChangeEmailType::class, $changeEmail);
+        $formEmail->handleRequest($request);
+
+        if($formEmail->isSubmitted() && $formEmail->isValid()) {
+           if($manager->getRepository(Entreprise::class)->findOneByEmail($changeEmail->getNewEmail())) {
+               $this->addFlash("warning", "L'email est déjà utilisé pour un compte entreprise.");
+           } else {
+               /** @var Entreprise $entreprise */
+               $entreprise = $this->getUser();
+
+               $entreprise->setNewEmail($changeEmail->getNewEmail());
+               $entreprise->setActivationKey(uniqid());
+               $manager->flush();
+
+               // TODO : Envoyer le mail
+
+               $this->addFlash("success", "Pour valider la modification de l'email, vous devez vérifiez votre adresse. Un mail d'activation vous a été envoyé.");
+           }
+        }
+
+
+        return $this->render("Entreprise/entreprise_identifiants.html.twig", [
+            "formEmail" => $formEmail->createView(),
+            "formPassword" => $formPassword->createView(),
+        ]);
     }
 }

@@ -20,7 +20,7 @@
                         {{ form_start(form) }}
 
                         <div class="card-header text-center text-uppercase h4 font-weight-light">
-                            Créer un compte entreprise
+                            Créer un compte client
                         </div>
 
                         <div class="card-body py-5">
@@ -55,32 +55,33 @@
 
 
 
-                            <h3>Informations société</h3>
+                            <h3>Informations profil</h3>
 
                             <p>
                                 {{ form_errors(form.nom) }}
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text">Société</span>
+                                        <span class="input-group-text">Nom</span>
                                     </div>
                                     {{ form_widget(form.nom) }}
+                                </div>
+
+                                {{ form_errors(form.prenom) }}
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Prénom</span>
+                                    </div>
+                                    {{ form_widget(form.prenom) }}
                                 </div>
 
                                 {{ form_errors(form.adresse) }}
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text">Adresse</span>
+                                        <span class="input-group-text h-100">Adresse</span>
                                     </div>
                                     {{ form_widget(form.adresse) }}
                                 </div>
 
-                                {{ form_errors(form.siren) }}
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">Société</span>
-                                    </div>
-                                    {{ form_widget(form.siren) }}
-                                </div>
                             </p>
 
 

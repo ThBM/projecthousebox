@@ -1,0 +1,75 @@
+{% extends "Entreprise/projet_detail.html.twig" %}
+{% set tabSelected = "photos" %}
+
+{% block tabContent %}
+    <div class="row justify-content-center mb-3 pl-3 pr-3">
+        <div class="col">
+
+        </div>
+        <div class="col text-right">
+            <a class="btn btn-success text-white" data-toggle="modal" data-target="#modal-addPhoto">Ajouter une photo</a>
+        </div>
+    </div>
+
+
+    <div class="row">
+
+        {% for photo in projet.photos %}
+        <div class="col-md-4">
+            <div class="thumbnail">
+                <a href="">
+                    <img src="{{ vich_uploader_asset(photo, "photoFile") }}" alt="{{ photo.titre }}" style="width:100%">
+                    <div class="caption">
+                        <h4 class="mb-0">{{ photo.titre }}</h4>
+                        <p>{{ photo.commentaires|nl2br }}</p>
+                        <div class="text-right"><a href="{{ path('entreprise_projets_photos_remove', {'id': photo.id}) }}" class="btn btn-danger text-white"><i class="fa fa-trash"></i></a></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <div class="modal fade" id="modal-addPhoto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            {{ form_start(form) }}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter une photo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    {{ form_errors(form.titre) }}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Titre</span>
+                        </div>
+                        {{ form_widget(form.titre) }}
+                    </div>
+
+                    {{ form_errors(form.commentaires) }}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text h-100">Commentaires</span>
+                        </div>
+                        {{ form_widget(form.commentaires) }}
+                    </div>
+
+                    {{ form_row(form.photoFile) }}
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter la photo</button>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

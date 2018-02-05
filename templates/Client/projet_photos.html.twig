@@ -1,0 +1,25 @@
+{% extends "Client/projet_detail.html.twig" %}
+{% set tabSelected = "photos" %}
+
+{% block tabContent %}
+
+
+    <div class="row">
+
+        {% for photo in projet.photos %}
+        <div class="col-md-4">
+            <div class="thumbnail">
+                <a href="">
+                    <img src="{{ vich_uploader_asset(photo, "photoFile") }}" alt="{{ photo.titre }}" style="width:100%">
+                    <div class="caption">
+                        <h4 class="mb-0">{{ photo.titre }}</h4>
+                        <p>{{ photo.commentaires|nl2br }}</p>
+                        <div class="text-right"><a href="{{ path('entreprise_projets_photos_remove', {'id': photo.id}) }}" class="btn btn-danger text-white"><i class="fa fa-trash"></i></a></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
