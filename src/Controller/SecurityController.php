@@ -66,7 +66,7 @@ class SecurityController extends Controller
             $entreprise->setActivationKey(uniqid());
 
             $em->persist($entreprise);
-            //$em->flush();
+            $em->flush();
 
 
             $mail = new \Swift_Message("Housebox : Activez votre compte");
