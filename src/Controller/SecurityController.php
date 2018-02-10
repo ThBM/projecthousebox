@@ -19,6 +19,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -44,7 +45,7 @@ class SecurityController extends Controller
     /**
      * @Route("/register/entreprise", name="security_register_entreprise")
      */
-    public function registerEntreprise(Request $request, ObjectManager $em, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer) {
+    public function registerEntreprise(Request $request, ObjectManager $em, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer, UrlGeneratorInterface $router) {
 
         $entreprise = new Entreprise();
         $form = $this->createForm(EntrepriseRegisterType::class, $entreprise);
@@ -53,7 +54,7 @@ class SecurityController extends Controller
         if($form->isSubmitted() && $form->isValid()) {
 
             if($em->getRepository(Entreprise::class)->findByEmail($entreprise->getEmail())) {
-                $this->addFlash("warning", "Cet email est déjà utilisé. Vous pouvez vous connecter.");
+                $this->addFlash("warning", "Cet email est déjà utilisé.");
                 return $this->redirectToRoute("security_login_entreprise");
             }
 
@@ -65,17 +66,27 @@ class SecurityController extends Controller
             $entreprise->setActivationKey(uniqid());
 
             $em->persist($entreprise);
-            $em->flush();
+            //$em->flush();
 
 
-            // TODO : Faire fonctionner le mail
             $mail = new \Swift_Message("Housebox : Activez votre compte");
-            $mail->setFrom("thibault.barolatmassole@gmail.com");
-            $mail->setTo("thibault.bm@icloud.com");
-            $mail->setBody("Activation key : ".$entreprise->getActivationKey());
+            $mail->setFrom("contact@housebox.fr");
+            $mail->setTo($entreprise->getEmail());
+            $mail->setBcc("contact@housebox.fr");
+            $mail->setBody(
+                $this->renderView("Emails/registration.html.twig", [
+                    "url" => $router->generate("security_activation_entreprise", ["activationKey" => $entreprise->getActivationKey()], UrlGeneratorInterface::ABSOLUTE_URL)
+                ]),
+                "text/html"
+            );
+            $mail->addPart(
+                $this->renderView("Emails/registration.txt.twig", [
+                    "url" => $router->generate("security_activation_entreprise", ["activationKey" => $entreprise->getActivationKey()], UrlGeneratorInterface::ABSOLUTE_URL)
+                ]),
+                "text/plain"
+            );
 
-            if($a = $mailer->send($mail))
-                $this->addFlash("success", "Email ok. TODO : check if email is sent. n=".$a);
+            $mailer->send($mail);
 
 
             $this->addFlash("success", "Votre compte a été créé. Un email vous a été envoyé pour activer votre compte.");
@@ -87,7 +98,7 @@ class SecurityController extends Controller
 
 
     /**
-     * @Route("/activation/entreprise/{activationKey}")
+     * @Route("/activation/entreprise/{activationKey}", name="security_activation_entreprise")
      */
     public function activateEntreprise($activationKey, ObjectManager $em) {
         if($activationKey == "") {
@@ -135,7 +146,7 @@ class SecurityController extends Controller
     /**
      * @Route("/register/client", name="security_register_client")
      */
-    public function registerClient(Request $request, ObjectManager $em, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer) {
+    public function registerClient(Request $request, ObjectManager $em, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer, UrlGeneratorInterface $router) {
         $client = new Client();
         $form = $this->createForm(ClientRegisterType::class, $client);
 
@@ -143,7 +154,7 @@ class SecurityController extends Controller
         if($form->isSubmitted() && $form->isValid()) {
 
             if($em->getRepository(Client::class)->findByEmail($client->getEmail())) {
-                $this->addFlash("warning", "Cet email est déjà utilisé. Vous pouvez vous connecter.");
+                $this->addFlash("warning", "Cet email est déjà utilisé.");
                 return $this->redirectToRoute("security_login_client");
             }
 
@@ -157,16 +168,24 @@ class SecurityController extends Controller
             $em->persist($client);
             $em->flush();
 
-
-            // TODO : Faire fonctionner le mail
             $mail = new \Swift_Message("Housebox : Activez votre compte");
-            $mail->setFrom("thibault.barolatmassole@gmail.com");
-            $mail->setTo("thibault.barolatmassole@gmail.com");
-            $mail->setBody("Activation key : ".$client->getActivationKey());
+            $mail->setFrom("contact@housebox.fr");
+            $mail->setTo($client->getEmail());
+            $mail->setBcc("contact@housebox.fr");
+            $mail->setBody(
+                $this->renderView("Emails/registration.html.twig", [
+                    "url" => $router->generate("security_activation_client", ["activationKey" => $client->getActivationKey()], UrlGeneratorInterface::ABSOLUTE_URL)
+                ]),
+                "text/html"
+            );
+            $mail->addPart(
+                $this->renderView("Emails/registration.txt.twig", [
+                    "url" => $router->generate("security_activation_client", ["activationKey" => $client->getActivationKey()], UrlGeneratorInterface::ABSOLUTE_URL)
+                ]),
+                "text/plain"
+            );
 
-            if($a = $mailer->send($mail))
-                $this->addFlash("success", "Email ok. TODO : check if email is sent. n=".$a);
-
+            $mailer->send($mail);
 
             $this->addFlash("success", "Votre compte a été créé. Un email vous a été envoyé pour activer votre compte.");
             return $this->redirectToRoute("security_login_client");
@@ -176,7 +195,7 @@ class SecurityController extends Controller
     }
 
     /**
-     * @Route("/activation/client/{activationKey}")
+     * @Route("/activation/client/{activationKey}", name="security_activation_client")
      */
     public function activateClient($activationKey, ObjectManager $em) {
         if($activationKey == "") {
