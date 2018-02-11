@@ -94,7 +94,7 @@ class Entreprise implements AdvancedUserInterface, \Serializable
     private $logoFile;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $logoUploadedAt;
 
