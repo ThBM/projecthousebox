@@ -28,7 +28,7 @@ security:
                 login_path: security_login_entreprise
                 check_path: entreprise_login_check
             logout:
-                path: logout
+                path: logout_entreprise
                 target: /
         client:
             pattern: ^/client
@@ -37,7 +37,7 @@ security:
                 login_path: security_login_client
                 check_path: client_login_check
             logout:
-                path: logout
+                path: logout_client
                 target: /
         main:
             anonymous: ~

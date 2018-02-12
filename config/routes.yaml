@@ -8,5 +8,8 @@ entreprise_login_check:
 client_login_check:
     path: /client/login_check
 
-logout:
+logout_entreprise:
     path: /entreprise/logout
+
+logout_client:
+    path: /client/logout
