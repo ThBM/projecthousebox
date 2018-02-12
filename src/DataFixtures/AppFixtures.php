@@ -9,6 +9,7 @@
 namespace App\DataFixtures;
 
 
+use App\Entity\Client;
 use App\Entity\Entreprise;
 use App\Entity\Projet;
 use App\Repository\EntrepriseRepository;
@@ -27,27 +28,37 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        /*for($i =0 ; $i < 5; $i++) {
+        //Ajout de $n entreprises
+        $n_entreprises = 5;
+        for($i = 1; $i <= $n_entreprises; $i++) {
             $entreprise = new Entreprise();
-            $entreprise->setEmail("entreprise".$i."@gmail.com");
-            $entreprise->setIsActive(true);
+            $entreprise->setEmail("entreprise".$i."@test.housebox.fr");
+            $entreprise->setNom("Entreprise ".$i);
             $entreprise->setRoles(["ROLE_USER"]);
-
-            $password = "aaaaaaaa";
-            $entreprise->setPassword($this->encoder->encodePassword($entreprise, $password));
-
+            $entreprise->setIsActive(true);
+            $entreprise->setActivationKey(uniqid());
+            $entreprise->setAdresse("");
+            $entreprise->setSiren("000000000");
+            $entreprise->setPassword($this->encoder->encodePassword($entreprise, "aaaaaaaa"));
             $manager->persist($entreprise);
         }
+        $manager->flush();
 
-
-        for($i = 1; $i < 100; $i++) {
-            $entreprise = $manager->getRepository(EntrepriseRepository::class)->find(rand(1,5));
-            $projet = new Projet();
-            $projet->setNom(chr($i));
-            $projet->setEntreprise($entreprise);
-            $manager->persist($projet);
+        //Ajout de $n clients
+        $n_clients = 100;
+        for($i = 1; $i <= $n_clients; $i++) {
+            $client = new Client();
+            $client->setEmail("client".$i."@test.housebox.fr");
+            $client->setPassword($this->encoder->encodePassword($client, "aaaaaaaa"));
+            $client->setRoles(["ROLE_USER"]);
+            $client->setIsActive(true);
+            $client->setActivationKey(uniqid());
+            $client->setNom("CLIENT ".$i);
+            $client->setPrenom("");
+            $client->setAdresse("");
+            $manager->persist($client);
         }
-
-        $manager->flush();*/
+        $manager->flush();
     }
+
 }
