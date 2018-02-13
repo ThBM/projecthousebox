@@ -19,6 +19,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -129,13 +130,49 @@ class SecurityController extends Controller
     /**
      * @Route("/login/client", name="security_login_client")
      */
-    public function loginClient(Request $request, AuthenticationUtils $authUtils)
+    public function loginClient(Request $request, AuthenticationUtils $authUtils, ObjectManager $manager, SessionInterface $session)
     {
         // get the login error if there is one
         $error = $authUtils->getLastAuthenticationError();
 
         // last username entered by the user
         $lastUsername = $authUtils->getLastUsername();
+
+
+        //Bloquer le compte en cas de tentative unfructueuse et message personnalisé
+        if($error) {
+            switch ($error->getMessageKey()) {
+                case "Invalid credentials." :
+                    $this->addFlash("warning", "L'Email / mot de passe est incorrect.");
+
+                    $failed_login = $session->get("failed_login");
+                    $failed_login = $failed_login ? $failed_login+1 : 1;
+                    $session->set("failed_login", $failed_login);
+
+                    if($failed_login >= 5) {
+                        $client = $manager->getRepository(Client::class)->findOneByEmail($lastUsername);
+                        if ($client) {
+                            $lockedUntil = new \DateTime();
+                            $lockedUntil->add(new \DateInterval("PT10M"));
+                            $client->setLockedUntilTime($lockedUntil);
+                            $manager->flush();
+                        }
+                        $session->set("failed_login", 0);
+                    }
+                    break;
+                case "Account is locked." :
+                    $client = $manager->getRepository(Client::class)->findOneByEmail($lastUsername);
+                    if($client) {
+                        $this->addFlash("warning", "Le compte est bloqué jusque ".$client->getLockedUntilTime()->format("H:i").".");
+                    }
+                    break;
+                case "Account is disabled." :
+                    $this->addFlash("warning", "Ce compte n'a pas été activé. Vérifiez vos emails, un email vous a été transmis pour l'activation.");
+                    break;
+                default:
+                    $this->addFlash("warning", "Une erreur s'est produite.");
+            }
+        }
 
         return $this->render('Client/login.html.twig', array(
             'last_username' => $lastUsername,

@@ -41,6 +41,11 @@ class Client implements AdvancedUserInterface
     private $isActive;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lockedUntilTime;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $activationKey;
@@ -114,7 +119,13 @@ class Client implements AdvancedUserInterface
      */
     public function isAccountNonLocked()
     {
-        return true;
+        if($this->lockedUntilTime == null)
+            return true;
+
+        if($this->lockedUntilTime <= new \DateTime())
+            return true;
+
+        return false;
     }
 
     /**
@@ -352,4 +363,22 @@ class Client implements AdvancedUserInterface
         }
         return false;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getLockedUntilTime()
+    {
+        return $this->lockedUntilTime;
+    }
+
+    /**
+     * @param mixed $lockedUntilTime
+     */
+    public function setLockedUntilTime($lockedUntilTime): void
+    {
+        $this->lockedUntilTime = $lockedUntilTime;
+    }
+
+
 }

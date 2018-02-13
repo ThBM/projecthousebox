@@ -61,20 +61,6 @@
                     </form>
                 </div>
 
-                {% if error %}
-                    <div class="alert alert-warning">
-                        <div>
-                            {% if error.messageKey|trans(error.messageData, 'security') == "Invalid credentials." %}
-                                Identifiant / Mot de passe incorrects.
-                            {% elseif error.messageKey|trans(error.messageData, 'security') == "Account is disabled."%}
-                                Votre compte n'a pas été activé. Voir le mail transmis à l'inscription.
-                            {% else %}
-                                {{ error.messageKey|trans(error.messageData, 'security') }}
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endif %}
-
                 {% for label, messages in app.flashes() %}
                     {% for message in messages %}
                         <div class="alert alert-dismissible alert-{{ label }}">

@@ -45,7 +45,7 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         //Ajout de $n clients
-        $n_clients = 100;
+        $n_clients = 50;
         for($i = 1; $i <= $n_clients; $i++) {
             $client = new Client();
             $client->setEmail("client".$i."@test.housebox.fr");
