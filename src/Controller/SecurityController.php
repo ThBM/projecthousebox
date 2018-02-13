@@ -29,13 +29,48 @@ class SecurityController extends Controller
     /**
      * @Route("/login/entreprise", name="security_login_entreprise")
      */
-    public function loginEntreprise(Request $request, AuthenticationUtils $authUtils)
+    public function loginEntreprise(Request $request, AuthenticationUtils $authUtils, ObjectManager $manager, SessionInterface $session)
     {
         // get the login error if there is one
         $error = $authUtils->getLastAuthenticationError();
 
         // last username entered by the user
         $lastUsername = $authUtils->getLastUsername();
+
+        //Gérer les erreurs de login
+        if($error) {
+            switch ($error->getMessageKey()) {
+                case "Invalid credentials." :
+                    $this->addFlash("warning", "L'Email / mot de passe est incorrect.");
+
+                    $failed_login = $session->get("failed_login");
+                    $failed_login = $failed_login ? $failed_login+1 : 1;
+                    $session->set("failed_login", $failed_login);
+
+                    if($failed_login >= 5) {
+                        $entreprise = $manager->getRepository(Entreprise::class)->findOneByEmail($lastUsername);
+                        if ($entreprise) {
+                            $lockedUntil = new \DateTime();
+                            $lockedUntil->add(new \DateInterval("PT10M"));
+                            $entreprise->setLockedUntilTime($lockedUntil);
+                            $manager->flush();
+                        }
+                        $session->set("failed_login", 0);
+                    }
+                    break;
+                case "Account is locked." :
+                    $entreprise = $manager->getRepository(Entreprise::class)->findOneByEmail($lastUsername);
+                    if($entreprise) {
+                        $this->addFlash("warning", "Le compte est bloqué jusque ".$entreprise->getLockedUntilTime()->format("H:i").".");
+                    }
+                    break;
+                case "Account is disabled." :
+                    $this->addFlash("warning", "Ce compte n'a pas été activé. Vérifiez vos emails, un email vous a été transmis pour l'activation.");
+                    break;
+                default:
+                    $this->addFlash("warning", "Une erreur s'est produite.");
+            }
+        }
 
         return $this->render('Entreprise/login.html.twig', array(
             'last_username' => $lastUsername,
@@ -139,7 +174,7 @@ class SecurityController extends Controller
         $lastUsername = $authUtils->getLastUsername();
 
 
-        //Bloquer le compte en cas de tentative unfructueuse et message personnalisé
+        //Gérer les erreurs de login
         if($error) {
             switch ($error->getMessageKey()) {
                 case "Invalid credentials." :

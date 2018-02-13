@@ -44,6 +44,11 @@ class Entreprise implements AdvancedUserInterface, \Serializable
     private $isActive;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lockedUntilTime;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Projet", mappedBy="entreprise")
      */
     private $projets;
@@ -237,7 +242,13 @@ class Entreprise implements AdvancedUserInterface, \Serializable
      */
     public function isAccountNonLocked()
     {
-        return true;
+        if($this->lockedUntilTime == null)
+            return true;
+
+        if($this->lockedUntilTime <= new \DateTime())
+            return true;
+
+        return false;
     }
 
     /**
@@ -468,4 +479,22 @@ class Entreprise implements AdvancedUserInterface, \Serializable
             $this->logo
             ) = unserialize($serialized);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getLockedUntilTime()
+    {
+        return $this->lockedUntilTime;
+    }
+
+    /**
+     * @param mixed $lockedUntilTime
+     */
+    public function setLockedUntilTime($lockedUntilTime): void
+    {
+        $this->lockedUntilTime = $lockedUntilTime;
+    }
+
+
 }
