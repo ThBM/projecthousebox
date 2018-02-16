@@ -115,7 +115,7 @@ class EntrepriseController extends Controller
     /**
      * @Route("/entreprise/projets/{id}/clients", name="entreprise_projets_clients")
      */
-    public function showProjetClients($id, Request $request, ObjectManager $manager) {
+    public function showProjetClients($id, Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer) {
         $projet = $manager->getRepository(Projet::class)->find($id);
 
         if(!$projet) {
@@ -135,7 +135,20 @@ class EntrepriseController extends Controller
                 if(!$client) {
                     // TODO : Ne pas signler que le client n'existe pas et créer un compte client + envoie du mail au client
                     // TODO : Dire dans tous les cas : une invitation a été envoyée au client.
-                    $this->addFlash("warning", "Le client n'existe pas.");
+                    $password_plain = $this->createRandomPassword(8);
+                    $client = $this->createClientInvitation($client_email, $password_plain, $encoder);
+                    $manager->persist($client);
+
+                    $clientProjet = new ClientProjet();
+                    $clientProjet->setClient($client);
+                    $clientProjet->setIsAcceptedByClient(false);
+                    $projet->addClientProjet($clientProjet);
+
+                    $manager->flush();
+
+                    $this->sendInvitationToNewClient($client, $password_plain, $mailer);
+
+                    $this->addFlash("success", "Une invitation au projet à été envoyé au client.");
                 } else {
                     $clientProjet = new ClientProjet();
                     $clientProjet->setClient($client);
@@ -598,5 +611,60 @@ class EntrepriseController extends Controller
             "formEmail" => $formEmail->createView(),
             "formPassword" => $formPassword->createView(),
         ]);
+    }
+
+    private function createClientInvitation($email, $password, UserPasswordEncoderInterface $encoder) {
+        $client = new Client();
+        $client->setEmail($email);
+        $client->setNom("");
+        $client->setPrenom("");
+        $client->setActivationKey(uniqid());
+        $client->setRoles(["ROLE_USER"]);
+        $client->setIsActive(true);
+        $client->setAdresse("");
+
+        $client->setPassword($encoder->encodePassword($client, $password));
+
+        return $client;
+    }
+
+    private function createRandomPassword($length) {
+        $alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        $password_plain = [];
+        $alphabet_len = strlen($alphabet) - 1;
+        for($i=1; $i<=$length; $i++) {
+            $rand = rand(0, $alphabet_len);
+            $password_plain[] = substr($alphabet, $rand, 1);
+        }
+        return implode("", $password_plain);
+    }
+
+    private function sendInvitationToNewClient(Client $client, $password, \Swift_Mailer $mailer) {
+
+        /** @var Entreprise $entreprise */
+        $entreprise = $this->getUser();
+
+        $mail = new \Swift_Message("Invitation au projet avec ".$entreprise->getNom());
+        $mail->setFrom("contact@housebox.fr");
+        $mail->setTo($client->getEmail());
+        $mail->setBcc("contact@housebox.fr");
+        $mail->setBody(
+            $this->renderView("Emails/invitation_projet.html.twig", [
+                "entreprise" => $entreprise,
+                "client" => $client,
+                "password" => $password
+            ]),
+            "text/html"
+        );
+        $mail->addPart(
+            $this->renderView("Emails/invitation_projet.txt.twig", [
+                "entreprise" => $entreprise,
+                "client" => $client,
+                "password" => $password
+            ]),
+            "text/plain"
+        );
+
+        $mailer->send($mail);
     }
 }
